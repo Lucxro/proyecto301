@@ -17,7 +17,7 @@ o administrador) se note un poco más la diferencia.
 - Darle una animación más agradable ante el cliente y que los mensajes de advertencia
 sean más interactivos.
 ## Métricas del Sprint
-- **Historias completadas:** 10 de 12
+- **Historias completadas:** 13 de 15
 
 ## Compromisos para el Próximo Sprint
 - Cumplir con todas las historias de usuario a su debido momento
