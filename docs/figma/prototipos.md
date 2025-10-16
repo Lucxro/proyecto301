@@ -84,25 +84,34 @@ Este documento centraliza toda la información sobre los **diseños y prototipos
 **Componentes diseñados:**
 
 #### Botones
-- **Primario:** Acciones principales (guardar, enviar)
-- **Secundario:** Acciones secundarias (cancelar, volver)
-- **Terciario:** Acciones terciarias (enlaces, texto)
-- **Estados:** Default, hover, active, disabled, loading
+- **Principal:** Diseñado para cambiar de interfaz (Ingresar, registrarse, continuar y pagar ahora)
+- **Secundario:** sirve para ver detalles de los equipos moviles (Ver detalles)
+- **Botón con icono:** Este ayudará al cliente a tener en claro la acción que va a realizar (Agregar al carrito)
+- **Variante hover:** Se cambia el color del botón al pasar en cursor.
+
+#### Iconos 
+- **De secciones:** Estos nos dan indicios de a donde nos vamos a dirigir cuando los presionemos (Perfil de usuario, carrito de compras o menu).
+-**De cambio de imagen:** Nos serán de ayuda para que el usuario pueda cambiar las diferentes imágenes del carrusel.
+
+#### Carrusel
+- **De imágenes:** Cuando el usuario presione los iconos "<" ">" cambiará de imágenes de una manera muy sutil.
+
+#### Tarjetas
+- **De información básica:** Da un resumen de la información general de los equipos moviles.
+- **De información detallada:** Nos detalla exactamente las caraterísticas que tiene el celular a elegie.
+- **De contacto:** Nos da información verídica para contactar con el equipo de soporte técnico de la página.
+
 
 #### Formularios
 - **Input text:** Entrada de texto estándar
 - **Input password:** Con toggle de visibilidad
 - **Select dropdown:** Con búsqueda
 - **Checkbox:** Individual y grupos
-- **Radio buttons:** Opciones excluyentes
-- **Date picker:** Selección de fechas
-- **File upload:** Carga de archivos
 
 #### Navegación
 - **Navbar:** Barra superior de navegación
 - **Sidebar:** Menú lateral colapsable
 - **Tabs:** Pestañas para contenido
-- **Pagination:** Paginación de listas
 
 #### Feedback
 - **Toast notifications:** Mensajes temporales
@@ -122,7 +131,7 @@ Este documento centraliza toda la información sobre los **diseños y prototipos
 ### Responsive Design
 
 **Breakpoints definidos:**
-- **Mobile:** 320px - 767px
+- **Mobile:** 402px+
 - **Desktop:** 1024px+
 
 ### Accesibilidad
@@ -198,9 +207,9 @@ R: Selecciona el elemento → Export → Configura formato y resolución → Exp
 
 ## Contacto y Soporte
 
-**Responsable de diseño:** [Nombre]  
+**Responsable de diseño:** Lucero Scharff🐞  
 **Canal de comunicación:** [Slack, Discord, etc.]  
-**Horario de disponibilidad:** [Especificar]
+**Horario de disponibilidad:** 7:30 am - 6:30 pm
 
 **Para dudas sobre el prototipo:**
 1. Revisar este documento primero
@@ -225,7 +234,7 @@ R: Selecciona el elemento → Export → Configura formato y resolución → Exp
 
 ---
 
-**Última actualización:** [Fecha]  
-**Mantenido por:** [Equipo de diseño/Product Owner]  
+**Última actualización:** 13/10/2025  
+**Mantenido por:** Lucero Scharff🐞  
 **Versión del documento:** 1.0
 
