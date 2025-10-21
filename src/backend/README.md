@@ -12,7 +12,7 @@ API REST desarrollada con Node.js, Express y PostgreSQL (Prisma ORM).
 
 1. Clonar el repositorio:
 ```bash
-git clone https://github.com/Lucxro/proyecto301.git
+git clone https://github.com/Meowwuw/PIAD-301.git
 cd backend
 ```
 
@@ -54,4 +54,4 @@ npm run dev
 
 ## Autor
 
-Proyecto educativo - Ingeniería de Software - Lucero🐞
+Proyecto educativo - Ingeniería de Software - Magenta 🌟🐱✨
