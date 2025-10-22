@@ -22,19 +22,19 @@ export const userController = {
             //Validacion basica
             if(!email || !name){
                 return res.status(400).json({
-                    succes:false,
+                    success:false,
                     message:'Email y nombre son obligatorios'
                 });
             }
             const newUser = await userService.createUser({email, name});
             res.status(201).json({
-                succes:true,
+                success:true,
                 data: newUser,
                 message: 'Usuario creado correctamente'
             });
         }catch(error){
             res.status(500).json({
-                sucess:false,
+                success:false,
                 message:error.message
             });
         }
@@ -47,13 +47,13 @@ export const userController = {
 
             const updateUser = await userService.updateUser(id, updateData);
             res.status(200).json({
-                succes:true,
+                success:true,
                 data:updateUser,
                 message: 'Usuario actualizado correctamente'
             });
         }catch(error){
             res.status(500).json({
-                sucess:false,
+                success:false,
                 message:error.message
             });
         }
