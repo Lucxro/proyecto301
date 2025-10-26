@@ -28,5 +28,3 @@ app.use('/api/users',userRoutes);
 app.listen(PORT,()=>{
     console.log("Servidor corriendo exitosamente 🚀")
 })
-
-

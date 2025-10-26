@@ -45,7 +45,7 @@ export const userController = {
             const {id} = req.params;
             const updateData = req.body;
 
-            const updateUser = await userService.updateUser(id, updateData);
+            const updateUser = await userService.updateUser(parseInt(id), updateData);
             res.status(200).json({
                 success:true,
                 data:updateUser,
@@ -55,6 +55,34 @@ export const userController = {
             res.status(500).json({
                 success:false,
                 message:error.message
+            });
+        }
+    },
+    
+    async deleteUser(req, res) {
+        try {
+            const { id } = req.params;
+
+            const userExists = await userService.getUserById(parseInt(id));
+            if (!userExists) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            // Eliminamos el usuario
+            await userService.deleteUser(parseInt(id));
+
+            res.status(200).json({
+                success: true,
+                message: 'Usuario eliminado correctamente'
+            });
+
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: error.message
             });
         }
     }

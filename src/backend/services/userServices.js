@@ -24,6 +24,16 @@ export const userService ={
         }
     },
 
+    async getUserById(id) {
+        try {
+            const user = await prisma.user.findUnique({
+                where: { id: parseInt(id) }
+            });
+            return user;
+        } catch (error) {
+            throw new Error('Error al obtener usuario: ' + error.message);
+        }
+    },
     //Actualizar usuario
     async updateUser(id, data){
         try{
@@ -34,5 +44,17 @@ export const userService ={
         }catch(error){
             throw new Error('Error al actualizar usuario'+ error.message);
         }
+    },
+
+    async deleteUser(id) {
+        try {
+            const deletedUser = await prisma.user.delete({
+                where: { id: parseInt(id) }
+            });
+            return deletedUser;
+        } catch (error) {
+            throw new Error(`Error al eliminar usuario: ${error.message}`);
+        }
     }
+
 }
