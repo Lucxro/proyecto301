@@ -1,5 +1,4 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,9 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model User {
   id Int @id @default(autoincrement())
   email String @unique
   name String 
+  password String? //VARCHAR   //Método tradicional
+  googleId String? //Método de login con Google
+  avatar String? //Obtener foto de perfil
 }
-

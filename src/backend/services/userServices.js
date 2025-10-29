@@ -46,6 +46,7 @@ export const userService ={
         }
     },
 
+    //Eliminar usuario
     async deleteUser(id) {
         try {
             const deletedUser = await prisma.user.delete({

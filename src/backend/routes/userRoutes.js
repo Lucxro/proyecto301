@@ -117,6 +117,30 @@ router.post('/',userController.createUser);
  */
 
 router.put('/:id', userController.updateUser);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *  delete:
+ *    summary: Eliminar usuario
+ *    tags: [Users]
+ *    parameters:
+ *      - in: path
+ *        name: id
+ *        required: true
+ *        schema:
+ *          type: integer
+ *        description: ID del usuario
+ *    responses:
+ *      200:
+ *        description: Usuario eliminado correctamente
+ *      404:
+ *        description: Usuario no encontrado
+ *      500:
+ *        description: Error del servidor
+ *
+ */
+router.delete("/:id", userController.deleteUser);
 //Metodo para eliminar DELETE
 //Metodo para actualizar PUT
 //Metodo para modificar PATCH
