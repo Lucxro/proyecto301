@@ -27,9 +27,9 @@ export const authControllers = {
             const user = req.user;
             const token = generateToken(isError.id, user.email);
 
-            res.redirect(`http://localhost:5173/`) //aquí URL del frontend
+            res.redirect(`http://localhost:5173/login-success?token=${token}`) //aquí URL del frontend
         }catch(error){
-            res.redirect(`http://localhost:5173/`) //Vistas de frontend
+            res.redirect(`http://localhost:5173/login-error?message=${error.message}`) //Vistas de frontend
         }
         
     }
