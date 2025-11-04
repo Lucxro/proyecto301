@@ -1,3 +1,9 @@
+/* Swiper CSS primero */
+@import "swiper/css";
+@import "swiper/css/navigation";
+@import "swiper/css/pagination";
+
+/* Tailwind base */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
