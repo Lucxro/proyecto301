@@ -5,7 +5,10 @@ export default {
     extend: {
       fontFamily:{
         sans:['Roboto','sans-serif']
-      }
+      },
+      colors: {
+        colorPrin: '#1D4ED8', 
+      },
     },
   },
   plugins: [],
