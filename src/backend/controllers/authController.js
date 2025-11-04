@@ -1,5 +1,5 @@
-import { authServices } from '../services/authServices.js';
-import { generateToken } from '../utils/auth.js';
+import { authServices } from "../services/authServices.js";
+import { generateToken } from "../utils/auth.js";
 
 export const authControllers = {
     //Registro tradicional
@@ -10,7 +10,7 @@ export const authControllers = {
 
             res.status(201).json({
                 succes: true,
-                message: 'Usuario registrado exitosamente',
+                message: "Usuario registrado exitosamente",
                 data: result
             });
         }catch(error){
@@ -22,15 +22,13 @@ export const authControllers = {
     },
 
     //Google Callback
-    async googleCallBack(){
+    async googleCallBack(req, res){
         try{
             const user = req.user;
-            const token = generateToken(isError.id, user.email);
-
-            res.redirect(`http://localhost:5173/login-success?token=${token}`) //aquí URL del frontend
+            const token = generateToken (user.id, user.email);
+            res.redirect(`http://localhost:5173/login-success?token=${token}`); //Vista de frontend exitoso      
         }catch(error){
-            res.redirect(`http://localhost:5173/login-error?message=${error.message}`) //Vistas de frontend
+            res.redirect(`http://localhost:5173/login-error?message=${error.message}`);//Vista de frontend si falla
         }
-        
     }
 };
