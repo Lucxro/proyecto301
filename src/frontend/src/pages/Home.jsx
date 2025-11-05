@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import Navbar from "./Navbar";
-import BannerCarousel from "../components/BannerCarousel";
-import ProductosDestacados from "../components/ProductosDestacados";
+import BannerCarousel from "./BannerCarousel";
+import ProductosDestacados from "./ProductosDestacados";
 
 function Home() {
   const [token, setToken] = useState(null);
