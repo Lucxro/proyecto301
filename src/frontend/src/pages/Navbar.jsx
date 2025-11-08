@@ -2,18 +2,27 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/images/icon-celular-24px.svg";
 import carritoIcon from "../assets/images/icon-carrito-compras-24px.svg";
+import { useCart } from "../context/CartContext";
+
 
 function Navbar({ token, onLogout }) {
+  const { cart } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-gray-300/50 shadow-md fixed w-full top-0 z-50">
+    <header className="bg-gray-400/50 shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
         {/* Contenedor central para logo y navegación */}
         <div className="flex items-center justify-between w-full">
           {/* Logo */}
           <div className="flex items-center space-x-2">
-            <Link to="/home" id="ALTech" className="text-xl font-bold text-blue-600">ALTech</Link>
+            <Link
+              to="/home"
+              id="ALTech"
+              className="text-xl font-bold text-blue-600"
+            >
+              ALTech
+            </Link>
             <img src={logo} alt="Logo" className="h-6" />
           </div>
 
@@ -66,11 +75,19 @@ function Navbar({ token, onLogout }) {
                 </Link>
               </>
             )}
-            <img
-              src={carritoIcon}
-              alt="Carrito de compras"
-              className="h-6 cursor-pointer"
-            />
+            <div className="relative">
+              <img
+                src={carritoIcon}
+                alt="Carrito de compras"
+                className="h-6 cursor-pointer"
+                onClick={() => (window.location.href = "/carrito")} // o abre un modal
+              />
+              {cart.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

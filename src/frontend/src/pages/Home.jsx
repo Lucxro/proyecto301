@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import BannerCarousel from "./BannerCarousel";
 import ProductosDestacados from "./ProductosDestacados";
+import Beneficios from "../components/Beneficios";
+import Footer from "./Footer";
 
 function Home() {
   const [token, setToken] = useState(null);
@@ -18,7 +20,7 @@ function Home() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-gray-100 min-h-screen">
       {/* Navbar */}
       <Navbar token={token} onLogout={handleLogout} />
 
@@ -29,6 +31,11 @@ function Home() {
 
       {/* Productos destacados */}
       <ProductosDestacados />
+
+      {/*Beneficios */}
+      <Beneficios/>
+
+      <Footer/>
     </div>
   );
 }

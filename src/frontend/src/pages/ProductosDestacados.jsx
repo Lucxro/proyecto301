@@ -1,28 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ProductoCard from "../components/ProductCard";
-
-import imgHuaweiP50 from "../assets/images/imagen-huawei-p50.jpg";
-import imgSamsungZ from "../assets/images/samsung-z-flip7.jpeg";
-import imgIphone14 from "../assets/images/iphone-14-pro-max.webp";
+import VerTodosButton from "../components/ButtonReu";
 
 function ProductosDestacados() {
-  const productos = [
-    { name: "Huawei P50 Pro", price: "$1,199", img: imgHuaweiP50, oferta: false },
-    { name: "Samsung Z Flip7", price: "$999", img: imgSamsungZ, oferta: false },
-    { name: "Iphone 14 Pro Max", price: "$899", img: imgIphone14, oferta: true },
-  ];
+  const [productos, setProductos] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/products")
+      .then((res) => res.json())
+      .then((data) => setProductos(data))
+      .catch((err) => console.error("Error al cargar productos:", err));
+  }, []);
 
   return (
     <section className="py-16 text-center">
       <h2 className="text-3xl font-bold mb-4">Productos Destacados</h2>
       <p className="text-gray-600 mb-10">
-        Descubre los últimos modelos de celulares con la mejor tecnología y precios increíbles
+        Descubre los últimos modelos de celulares con la mejor tecnología y
+        precios increíbles
       </p>
 
+      {/* Grid de productos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
-        {productos.map((producto, index) => (
-          <ProductoCard key={index} producto={producto} />
-        ))}
+        {productos.length > 0 ? (
+          productos.map((product) => (
+            <ProductoCard key={product.id} product={product} />
+          ))
+        ) : (
+          <p className="text-gray-500">Cargando productos...</p>
+        )}
+      </div>
+
+      {/* Botón reutilizable */}
+      <div className="mt-10">
+        <VerTodosButton />
       </div>
     </section>
   );

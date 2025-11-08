@@ -11,7 +11,6 @@ function App() {
 
   const handleLogout = () => {
     setToken(null);
-    // opcional: redirigir a login o home
   };
 
   return (

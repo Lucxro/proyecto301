@@ -1,36 +1,42 @@
+import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import imgIphone from "../assets/images/imagen-iphone15-pro-max.webp";
-import imgSamsung from "../assets/images/imagen-samsung-s23-ultra.webp";
-import imgGooglePro from "../assets/images/imagen-google-pixel-8pro.webp";
 
 function BannerCarousel() {
-  const slides = [
-    {
-      title: "iPhone 15 Pro Max",
-      subtitle: "Ahora con descuento especial",
-      button: "Ver Ofertas",
-      image: imgIphone,
-      overlay: "bg-gray-900/25", 
-    },
-    {
-      title: "Samsung Galaxy S23 Ultra",
-      subtitle: "Captura cada detalle con su cámara de 200MP",
-      button: "Descubrir más",
-      image: imgSamsung,
-      overlay: "bg-gray-900/25", 
-    },
-    {
-      title: "Google Pixel 8 Pro",
-      subtitle: "La inteligencia de Google en tus manos",
-      button: "Explorar",
-      image: imgGooglePro,
-      overlay: "bg-gray-900/25", 
-    },
-  ];
+  const [slides, setSlides] = useState([]);
+  const backendURL = "http://localhost:3000";
+
+  // 🔹 Cargar banners desde la API del backend
+  useEffect(() => {
+    fetch(`${backendURL}/api/banners`)
+      .then((res) => res.json())
+      .then((data) => {
+        // Si la API devuelve banners válidos
+        const formattedSlides = data.map((banner) => ({
+          title: banner.title || "Promoción destacada",
+          subtitle: banner.description || "",
+          button: "Ver más",
+          image: `${backendURL}${banner.imageUrl}`,
+          overlay: "bg-gray-900/25",
+          link: banner.link || "/productos-vista",
+        }));
+        setSlides(formattedSlides);
+      })
+      .catch((err) => {
+        console.error("Error al cargar banners:", err);
+      });
+  }, []);
+
+  if (slides.length === 0) {
+    return (
+      <div className="w-full h-[300px] md:h-[450px] lg:h-[550px] flex items-center justify-center bg-gray-100">
+        <p className="text-gray-500 text-lg animate-pulse">Cargando banners...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="container mx-auto px-4 md:px-8 lg:px-16">
+    <div className="w-full">
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
         navigation
@@ -61,9 +67,11 @@ function BannerCarousel() {
                 <p className="text-sm md:text-lg mb-4 drop-shadow-md">
                   {slide.subtitle}
                 </p>
-                <button className="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-200 transition">
-                  {slide.button}
-                </button>
+                <a href={slide.link}>
+                  <button className="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg hover:bg-gray-200 transition">
+                    {slide.button}
+                  </button>
+                </a>
               </div>
             </div>
           </SwiperSlide>
