@@ -5,18 +5,37 @@ import { ShoppingCart, Star } from "lucide-react";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
-  const { addToCompare, isInCompare } = useCompare();
+  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+
   const [showOverlay, setShowOverlay] = useState(false);
+  const [overlayMessage, setOverlayMessage] = useState("");
+  const [showCartOverlay, setShowCartOverlay] = useState(false);
+  const [cartMessage, setCartMessage] = useState("");
 
   if (!product) return null;
 
+  const enComparacion = isInCompare(product.id);
+
   const handleCompare = () => {
-    addToCompare(product);
+    if (enComparacion) {
+      removeFromCompare(product.id);
+      setOverlayMessage("❌ Producto eliminado de comparación");
+    } else {
+      addToCompare(product);
+      setOverlayMessage("✅ Producto agregado a comparación");
+    }
+
     setShowOverlay(true);
-    setTimeout(() => setShowOverlay(false), 2000); // 2 segundos de superposición
+    setTimeout(() => setShowOverlay(false), 2000);
   };
 
-  const enComparacion = isInCompare(product.id);
+
+  const handleAddToCart = () => {
+    addToCart(product);
+    setCartMessage("🛒 Producto agregado al carrito correctamente");
+    setShowCartOverlay(true);
+    setTimeout(() => setShowCartOverlay(false), 2000);
+  };
 
   const renderStars = (rating) => {
     if (!rating) return null;
@@ -38,10 +57,10 @@ export default function ProductCard({ product }) {
   };
 
   return (
-    <div className="rounded-2xl shadow p-4 bg-white relative flex flex-col justify-between h-full">
+    <div className="rounded-2xl shadow p-4 bg-white relative flex flex-col justify-between h-full transition-transform duration-200 hover:scale-[1.02]">
       {/* Etiquetas */}
       {product.oferta && (
-        <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
+        <span className="absolute top-10 left-8 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
           Oferta
         </span>
       )}
@@ -83,9 +102,9 @@ export default function ProductCard({ product }) {
         <div className="mt-3 flex justify-center gap-2">
           <button
             onClick={handleCompare}
-            className={`flex items-center gap-1 border rounded-lg px-3 py-1 text-sm transition ${
+            className={`flex items-center gap-1 border rounded-lg px-3 py-1 text-sm transition font-medium ${
               enComparacion
-                ? "bg-blue-600 text-white"
+                ? "bg-blue-600 text-white hover:bg-blue-700"
                 : "hover:bg-gray-100 text-gray-800"
             }`}
           >
@@ -93,7 +112,7 @@ export default function ProductCard({ product }) {
           </button>
           <button
             disabled={product.stock === 0}
-            onClick={() => addToCart(product)}
+            onClick={handleAddToCart}
             className={`flex items-center gap-1 rounded-lg px-3 py-1 text-sm text-white ${
               product.stock === 0
                 ? "bg-gray-400 cursor-not-allowed"
@@ -106,15 +125,31 @@ export default function ProductCard({ product }) {
         </div>
       </div>
 
-      {/* Overlay de confirmación */}
-      {showOverlay && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-2xl animate-fadeIn">
-          <p className="bg-white text-blue-700 px-4 py-2 rounded-lg shadow-md font-medium">
-            ¡Producto agregado a comparación!
-          </p>
-        </div>
-      )}
+      {/* Overlay de comparación */}
+      <div
+        className={`absolute inset-0 bg-black/20 flex items-center justify-center rounded-2xl z-40 transition-all duration-500 ${
+          showOverlay
+            ? "opacity-100 scale-100 pointer-events-auto"
+            : "opacity-0 scale-95 pointer-events-none"
+        }`}
+      >
+        <p className="bg-white text-blue-700 px-5 py-2 rounded-lg shadow-md font-medium animate-fadeIn">
+          {overlayMessage}
+        </p>
+      </div>
+
+      {/* Overlay de carrito */}
+      <div
+        className={`absolute inset-0 bg-black/20 flex items-center justify-center rounded-2xl z-50 transition-all duration-500 ${
+          showCartOverlay
+            ? "opacity-100 scale-100 pointer-events-auto"
+            : "opacity-0 scale-95 pointer-events-none"
+        }`}
+      >
+        <p className="bg-white text-green-700 px-5 py-2 rounded-lg shadow-md font-medium animate-fadeIn">
+          {cartMessage}
+        </p>
+      </div>
     </div>
   );
 }
-
