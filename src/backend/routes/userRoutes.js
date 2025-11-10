@@ -24,14 +24,14 @@ const router = express.Router();
 /**
  * @swagger
  * /api/users:
- *  get:
- *    summary: Obtener todos los usuarios
- *    tags: [Users]
- *    responses:
- *      200:
- *        description: OK
- * 
+ *   get:
+ *     summary: Obtener todos los usuarios
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: OK
  */
+
 router.get('/',userController.getUsers);
 
 /**

@@ -6,7 +6,7 @@ const router = express.Router();
  * @swagger
  * /api/email/register:
  *   post:
- *     summary: Registrar usuario y enviar
+ *     summary: Registrar usuario y enviar correo
  *     tags: [Email]
  *     requestBody:
  *       required: true
@@ -27,6 +27,7 @@ const router = express.Router();
  *       500:
  *         description: Error del servicio al enviar Email.
  */
-router.post('/register', registerUser)
+router.post('/register', registerUser);
+
 
 export default router;

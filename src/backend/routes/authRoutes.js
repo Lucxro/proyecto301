@@ -17,8 +17,41 @@ const router = express.Router();
 /**
  * @swagger
  * /api/auth/register:
+ *   post:
+ *     summary: Registrar nuevo usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: margarita@gmail.com
+ *               name:
+ *                 type: string
+ *                 example: Margarita
+ *               password:
+ *                 type: string
+ *                 example: patito123
+ *     responses:
+ *       201:
+ *         description: Usuario registrado exitosamente
+ *       400:
+ *         description: Datos enviados incorrectos
+ *       500:
+ *         description: Error interno del servidor
+ */
+
+router.post("/register", authControllers.register);
+
+/**
+ * @swagger
+ * /api/auth/login:
  *  post:
- *    summary: Registrar nuevo usuario
+ *    summary: Iniciar sesión de usuario tradicional
  *    tags: [Auth]
  *    requestBody:
  *      required: true
@@ -30,29 +63,42 @@ const router = express.Router();
  *              email:
  *                type: string
  *                example: margarita@gmail.com
- *              name:
- *                type: string
- *                example: Margarita
  *              password:
  *                type: string
  *                example: patito123
  *    responses:
- *      201:
- *        description: Usuario registrado exitosamente
- *      400:
- *        description: Datos enviados incorrectos
+ *      200:
+ *        description: Inicio de sesión exitoso
+ *      401:
+ *        description: Credenciales incorrectas
  *      500:
  *        description: Error interno del servidor
  */
-router.post("/register", authControllers.register);
+router.post("/login", authControllers.login);
 
+/**
+ * @swagger
+ * /api/auth/google:
+ *  get:
+ *    summary: Autenticación con Google
+ *    tags: [Auth]
+ *    description: Redirige al flujo de autenticación de Google
+ */
 router.get(
   "/google",
   passport.authenticate("google", {
-    scope: ["profile", "email"], 
+    scope: ["profile", "email"],
   })
 );
 
+/**
+ * @swagger
+ * /api/auth/google/callback:
+ *  get:
+ *    summary: Callback de autenticación con Google
+ *    tags: [Auth]
+ *    description: Procesa el token de usuario y redirige al frontend
+ */
 router.get(
   "/google/callback",
   passport.authenticate("google", {

@@ -5,6 +5,8 @@ import passport from "passport";
 import path from "path";
 import { fileURLToPath } from "url"; 
 import session from "express-session";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./swagger.js";
 
 import "./config/passport.js"; 
 import userRoutes from "./routes/userRoutes.js";
@@ -13,8 +15,6 @@ import authRoutes from "./routes/authRoutes.js";
 import productsRoutes from "./routes/productsRoutes.js";
 import bannerRoutes from "./routes/bannerRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
-import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./swagger.js";
 
 // Configuración de paths para ESModules
 const __filename = fileURLToPath(import.meta.url);

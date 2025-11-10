@@ -8,40 +8,37 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String
-  password String? // Método tradicional
-  googleId String? @unique // Método de login con Google
-  avatar   String? // Foto de perfil
-
+  id        Int        @id @default(autoincrement())
+  email     String     @unique
+  name      String
+  password  String?
+  googleId  String?    @unique
+  avatar    String?
   cartItems CartItem[]
 }
 
 model Product {
-  id           Int      @id @default(autoincrement())
-  name         String
-  description  String
-  price        Float
-  oldPrice     Float?
-  imageUrl     String
-  oferta       Boolean   @default(false)
-  stock        Int       @default(10)
-  rating       Float?
-  sistema      String?
+  id             Int        @id @default(autoincrement())
+  name           String
+  description    String
+  price          Float
+  oldPrice       Float?
+  imageUrl       String
+  oferta         Boolean    @default(false)
+  rating         Float?
+  createdAt      DateTime   @default(now())
   almacenamiento String?
-  ram          String?
-  camara       String?
-  bateria      String?
-  pantalla     String?
-  color        String[] 
-  disponibilidad String?  @default("En Stock")
-  detalles     String?
-  createdAt DateTime @default(now())
-
-  cartItems CartItem[]
+  bateria        String?
+  camara         String?
+  detalles       String?
+  disponibilidad String?    @default("En Stock")
+  pantalla       String?
+  ram            String?
+  sistema        String?
+  stock          Int        @default(10)
+  color          String[]
+  cartItems      CartItem[]
 }
-
 
 model Banner {
   id          Int      @id @default(autoincrement())
@@ -57,13 +54,11 @@ model Banner {
 }
 
 model CartItem {
-  id        Int  @id @default(autoincrement())
-  quantity  Int  @default(1)
+  id        Int      @id @default(autoincrement())
+  quantity  Int      @default(1)
   userId    Int?
   productId Int
-
-  user    User?   @relation(fields: [userId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
-
   createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User?    @relation(fields: [userId], references: [id])
 }
