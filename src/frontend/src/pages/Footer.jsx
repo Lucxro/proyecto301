@@ -56,7 +56,7 @@ function Footer() {
 
       {/* Línea inferior */}
       <div className="mt-10 border-t border-blue-400 pt-6 text-center text-gray-100 text-sm">
-        © 2024 ALTech. Todos los derechos reservados.
+        © 2025 ALTech. Todos los derechos reservados.
       </div>
     </footer>
   );

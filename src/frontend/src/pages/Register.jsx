@@ -1,5 +1,6 @@
+// Register.jsx
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -9,12 +10,13 @@ function Register() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    // Validar coincidencia de contraseñas
     if (password !== confirm) {
       setError("Las contraseñas no coinciden");
       return;
@@ -41,16 +43,29 @@ function Register() {
 
       // Redirigir tras unos segundos
       setTimeout(() => {
-        window.location.href = "/login";
+        navigate("/login", { replace: true });
       }, 2000);
     } catch (err) {
       setError(err.message);
     }
   };
 
+  const handleGoHome = () => {
+    navigate("/", { replace: true });
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white rounded-xl shadow-md w-full max-w-md text-center">
+      <div className="p-8 bg-white rounded-xl shadow-md w-full max-w-md text-center relative">
+        {/* Botón volver al inicio */}
+        <button
+          onClick={handleGoHome}
+          className="absolute top-4 left-4 text-gray-500 hover:text-blue-600 text-xl"
+          aria-label="Volver al inicio"
+        >
+          ←
+        </button>
+
         <h1 className="text-2xl font-bold mb-4">Crear una cuenta</h1>
         <p className="mb-6 text-gray-600">
           Regístrate para empezar a disfrutar de nuestros servicios
@@ -113,12 +128,10 @@ function Register() {
             Registrarse
           </button>
 
-          {/* Mensajes */}
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
           {success && <p className="text-green-600 text-sm mt-2">{success}</p>}
         </form>
 
-        {/* Enlace para login */}
         <p className="text-gray-600 text-sm mt-6">
           ¿Ya tienes una cuenta?{" "}
           <Link to="/login" className="text-blue-500 hover:underline">
@@ -131,3 +144,4 @@ function Register() {
 }
 
 export default Register;
+

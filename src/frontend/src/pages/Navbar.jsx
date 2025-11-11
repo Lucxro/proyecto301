@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/images/icon-celular-24px.svg";
 import carritoIcon from "../assets/images/icon-carrito-compras-24px.svg";
 import { useCart } from "../context/CartContext";
+import { AuthContext } from "../context/AuthContext";
 
-function Navbar({ token, onLogout }) {
+function Navbar() {
+  const { token, logout } = useContext(AuthContext);
   const { cart } = useCart();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -58,7 +60,7 @@ function Navbar({ token, onLogout }) {
 
           {token ? (
             <button
-              onClick={onLogout}
+              onClick={logout}
               className="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
             >
               Cerrar sesión
@@ -112,7 +114,7 @@ function Navbar({ token, onLogout }) {
           {token ? (
             <button
               onClick={() => {
-                onLogout();
+                logout();
                 setIsMobileMenuOpen(false);
               }}
               className="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
@@ -121,10 +123,18 @@ function Navbar({ token, onLogout }) {
             </button>
           ) : (
             <>
-              <Link to="/login" onClick={() => setIsMobileMenuOpen(false)} className="text-gray-700 hover:text-blue-600">
+              <Link
+                to="/login"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="text-gray-700 hover:text-blue-600"
+              >
                 Iniciar sesión
               </Link>
-              <Link to="/register" onClick={() => setIsMobileMenuOpen(false)} className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 transition">
+              <Link
+                to="/register"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 transition"
+              >
                 Registrarse
               </Link>
             </>
@@ -136,3 +146,4 @@ function Navbar({ token, onLogout }) {
 }
 
 export default Navbar;
+

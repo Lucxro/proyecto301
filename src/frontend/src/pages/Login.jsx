@@ -1,3 +1,4 @@
+// Login.jsx
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -42,15 +43,28 @@ function Login() {
     }
   };
 
-  // Si está logueado, redirige
+  // Si ya está logueado, redirige al home inmediatamente
   if (token) {
     navigate("/", { replace: true });
     return null;
   }
 
+  const handleGoHome = () => {
+    navigate("/");
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white rounded-xl shadow-md w-full max-w-md text-center">
+      <div className="p-8 bg-white rounded-xl shadow-md w-full max-w-md text-center relative">
+        {/* Botón volver al inicio */}
+        <button
+          onClick={handleGoHome}
+          className="absolute top-4 left-4 text-gray-500 hover:text-blue-600 text-xl"
+          aria-label="Volver al inicio"
+        >
+          ←
+        </button>
+
         <h1 className="text-2xl font-bold mb-4">Iniciar Sesión</h1>
         <p className="mb-6 text-gray-600">
           Ingresa con tu correo o con una cuenta social
@@ -118,22 +132,22 @@ function Login() {
             href={FACEBOOK_AUTH_URL}
             className="flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors"
           >
-            <FaFacebookF size={20} className="text-blue‑600" />
-            <span className="text-gray‑700 font-medium">Iniciar sesión con Facebook</span>
+            <FaFacebookF size={20} className="text-blue-600" />
+            <span className="text-gray-700 font-medium">Iniciar sesión con Facebook</span>
           </a>
 
           <a
             href={APPLE_AUTH_URL}
-            className="flex items-center justify-center gap-2 border border-gray‑300 rounded-lg py-2 px-4 hover:bg-gray‑100 transition-colors"
+            className="flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors"
           >
             <FaApple size={20} />
-            <span className="text-gray‑700 font‑medium">Iniciar sesión con Apple</span>
+            <span className="text-gray-700 font-medium">Iniciar sesión con Apple</span>
           </a>
         </div>
 
         <p className="text-gray-600 text-sm mt-6">
           ¿No tienes una cuenta?{" "}
-          <Link to="/register" className="text-blue‑500 hover:underline">Regístrate aquí</Link>
+          <Link to="/register" className="text-blue-500 hover:underline">Regístrate aquí</Link>
         </p>
       </div>
     </div>

@@ -25,12 +25,14 @@ function Home() {
       <Navbar token={token} onLogout={handleLogout} />
 
       {/* Carrusel */}
-      <section className="mt-16">
+      <section className="pt-14 sm: pt-12">
         <BannerCarousel />
       </section>
 
       {/* Productos destacados */}
-      <ProductosDestacados />
+      <section className="mt-16">
+        <ProductosDestacados />
+      </section>
 
       {/*Beneficios */}
       <Beneficios/>
