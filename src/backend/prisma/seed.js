@@ -5,7 +5,6 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🌱 Iniciando seed de banners y productos...");
 
-  // === BANNERS ===
   const bannerCount = await prisma.banner.count();
   if (bannerCount === 0) {
     await prisma.banner.createMany({
@@ -48,7 +47,6 @@ async function main() {
     console.log("✅ Banners creados correctamente");
   }
 
-  // === PRODUCTOS ===
   const productCount = await prisma.product.count();
   if (productCount === 0) {
     await prisma.product.createMany({
@@ -70,6 +68,7 @@ async function main() {
           pantalla: "6.6” OLED 120Hz",
           color: ["Cocoa Gold", "Golden Black", "White", "Blue"],
           disponibilidad: "En Stock",
+          marca: "Huawei",
           detalles:
             "El Huawei P50 Pro ofrece una cámara Leica de alto rendimiento, pantalla OLED fluida y diseño premium.",
         },
@@ -90,6 +89,7 @@ async function main() {
           pantalla: "6.7” AMOLED FHD+ 120Hz",
           color: ["Lavender", "Graphite", "Cream", "Mint", "Yellow"],
           disponibilidad: "En Stock",
+          marca: "Samsung",
           detalles:
             "El Galaxy Z Flip7 ofrece una experiencia moderna con diseño plegable y cámaras de nivel flagship.",
         },
@@ -111,6 +111,7 @@ async function main() {
           pantalla: "6.7” Super Retina XDR OLED",
           color: ["Deep Purple", "Silver", "Gold", "Space Black"],
           disponibilidad: "En Stock",
+          marca: "iPhone",
           detalles:
             "El iPhone 14 Pro Max combina rendimiento y cámara profesional en un diseño de titanio de alta gama.",
         },
@@ -132,6 +133,7 @@ async function main() {
           pantalla: "6.73” AMOLED QHD+ 120Hz",
           color: ["White Ceramic", "Black Leather", "Blue"],
           disponibilidad: "En Stock",
+          marca: "Xiaomi",
           detalles:
             "El Xiaomi 14 Ultra redefine la fotografía móvil con lentes Leica y un rendimiento de élite.",
         },
@@ -153,6 +155,7 @@ async function main() {
           pantalla: "6.82” AMOLED QHD+ 120Hz",
           color: ["Flowy Emerald", "Matte Black", "Silver Gray"],
           disponibilidad: "Agotado",
+          marca: "OnePlus",
           detalles:
             "El OnePlus 12 ofrece potencia bruta y fluidez, ideal para gaming y multitarea.",
         },

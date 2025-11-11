@@ -37,6 +37,7 @@ model Product {
   sistema        String?
   stock          Int        @default(10)
   color          String[]
+  marca          String?
   cartItems      CartItem[]
 }
 
