@@ -15,6 +15,7 @@ import authRoutes from "./routes/authRoutes.js";
 import productsRoutes from "./routes/productsRoutes.js";
 import bannerRoutes from "./routes/bannerRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 // Configuración de paths para ESModules
 const __filename = fileURLToPath(import.meta.url);
@@ -59,6 +60,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/", orderRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo y escuchando en el puerto ${PORT}`);
