@@ -1,16 +1,11 @@
-import { useState } from "react";
+import { Star, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useCompare } from "../context/CompareContext";
-import { ShoppingCart, Star } from "lucide-react";
+import toast from "react-hot-toast";
 
 export default function ProductCard({ product }) {
   const { addToCart } = useCart();
   const { addToCompare, removeFromCompare, isInCompare } = useCompare();
-
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [overlayMessage, setOverlayMessage] = useState("");
-  const [showCartOverlay, setShowCartOverlay] = useState(false);
-  const [cartMessage, setCartMessage] = useState("");
 
   if (!product) return null;
 
@@ -19,22 +14,42 @@ export default function ProductCard({ product }) {
   const handleCompare = () => {
     if (enComparacion) {
       removeFromCompare(product.id);
-      setOverlayMessage("❌ Producto eliminado de comparación");
+      toast.error(` ${product.name} eliminado de comparación`, {
+        position: "bottom-right",
+        style: {
+          background: "#dc2626",
+          color: "#fff",
+          borderRadius: "10px",
+          padding: "10px 15px",
+        },
+        icon: "⚖️",
+      });
     } else {
       addToCompare(product);
-      setOverlayMessage("✅ Producto agregado a comparación");
+      toast.success(`⚖️ ${product.name} agregado a comparación`, {
+        position: "bottom-right",
+        style: {
+          background: "#2563eb",
+          color: "#fff",
+          borderRadius: "10px",
+          padding: "10px 15px",
+        },
+      });
     }
-
-    setShowOverlay(true);
-    setTimeout(() => setShowOverlay(false), 2000);
   };
 
-
   const handleAddToCart = () => {
+    if (product.stock === 0) return;
     addToCart(product);
-    setCartMessage("🛒 Producto agregado al carrito correctamente");
-    setShowCartOverlay(true);
-    setTimeout(() => setShowCartOverlay(false), 2000);
+    toast.success(`🛒 ${product.name} agregado al carrito`, {
+      position: "bottom-right",
+      style: {
+        background: "#2563eb",
+        color: "#fff",
+        borderRadius: "10px",
+        padding: "10px 15px",
+      },
+    });
   };
 
   const renderStars = (rating) => {
@@ -94,7 +109,9 @@ export default function ProductCard({ product }) {
             ${product.price}
           </span>
           {product.oldPrice && (
-            <span className="text-gray-400 line-through">${product.oldPrice}</span>
+            <span className="text-gray-400 line-through">
+              ${product.oldPrice}
+            </span>
           )}
         </div>
 
@@ -124,32 +141,7 @@ export default function ProductCard({ product }) {
           </button>
         </div>
       </div>
-
-      {/* Overlay de comparación */}
-      <div
-        className={`absolute inset-0 bg-black/20 flex items-center justify-center rounded-2xl z-40 transition-all duration-500 ${
-          showOverlay
-            ? "opacity-100 scale-100 pointer-events-auto"
-            : "opacity-0 scale-95 pointer-events-none"
-        }`}
-      >
-        <p className="bg-white text-blue-700 px-5 py-2 rounded-lg shadow-md font-medium animate-fadeIn">
-          {overlayMessage}
-        </p>
-      </div>
-
-      {/* Overlay de carrito */}
-      <div
-        className={`absolute inset-0 bg-black/20 flex items-center justify-center rounded-2xl z-50 transition-all duration-500 ${
-          showCartOverlay
-            ? "opacity-100 scale-100 pointer-events-auto"
-            : "opacity-0 scale-95 pointer-events-none"
-        }`}
-      >
-        <p className="bg-white text-green-700 px-5 py-2 rounded-lg shadow-md font-medium animate-fadeIn">
-          {cartMessage}
-        </p>
-      </div>
     </div>
   );
 }
+

@@ -10,6 +10,11 @@ import DetalleProducto from "./pages/DetalleProducto";
 import Navbar from "./pages/Navbar";
 import { CartProvider } from "./context/CartContext";
 import { CompareProvider } from "./context/CompareContext";
+import CarritoVista from "./pages/CarritoVista";
+import Checkout from "./pages/Checkout"; 
+
+// 👇 Importa react-hot-toast
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { token, login, logout, loading } = useContext(AuthContext);
@@ -56,10 +61,43 @@ function App() {
             path="/register"
             element={!token ? <Register /> : <Navigate to="/" replace />}
           />
+          <Route path="/carrito" element={<CarritoVista />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="/productos-vista" element={<ProductosVista />} />
           <Route path="/producto/:id" element={<DetalleProducto />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            duration: 2500,
+            style: {
+              background: "#2563eb",
+              color: "#fff",
+              borderRadius: "10px",
+              padding: "10px 16px",
+              boxShadow: "0 4px 12px rgba(37, 99, 235, 0.3)",
+              fontSize: "14px",
+              fontWeight: "500",
+            },
+            success: {
+              iconTheme: {
+                primary: "#fff",
+                secondary: "#2563eb",
+              },
+            },
+            error: {
+              style: {
+                background: "#dc2626", 
+              },
+              iconTheme: {
+                primary: "#fff",
+                secondary: "#dc2626",
+              },
+            },
+          }}
+        />
       </CompareProvider>
     </CartProvider>
   );

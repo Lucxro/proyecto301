@@ -12,6 +12,9 @@ function ProductosDestacados() {
       .catch((err) => console.error("Error al cargar productos:", err));
   }, []);
 
+  // 🔹 Solo mostramos los primeros 5 productos
+  const productosDestacados = productos.slice(0, 5);
+
   return (
     <section className="py-16 text-center">
       <h2 className="text-3xl font-bold mb-4">Productos Destacados</h2>
@@ -23,7 +26,7 @@ function ProductosDestacados() {
       {/* Grid de productos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
         {productos.length > 0 ? (
-          productos.map((product) => (
+          productosDestacados.map((product) => (
             <ProductoCard key={product.id} product={product} />
           ))
         ) : (

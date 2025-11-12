@@ -1,4 +1,4 @@
-// Login.jsx
+// pages/Login.jsx
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -10,6 +10,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // 🔹 Nuevo estado de carga
 
   const { login, token } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsLoading(true); // 🔹 Activamos el estado de carga
 
     try {
       const res = await fetch("http://localhost:3000/api/auth/login", {
@@ -31,32 +33,30 @@ function Login() {
 
       const data = await res.json();
 
-      if (!res.ok) {
+      if (!res.ok || !data.success) {
         throw new Error(data.message || "Error al iniciar sesión");
       }
 
-      // Suponiendo que el backend devuelve { token: "..." }
-      login(data.token);
+      const { token, user } = data.data;
+      login(token, user);
       navigate("/", { replace: true });
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsLoading(false); // 🔹 Terminamos el estado de carga
     }
   };
 
-  // Si ya está logueado, redirige al home inmediatamente
   if (token) {
     navigate("/", { replace: true });
     return null;
   }
 
-  const handleGoHome = () => {
-    navigate("/");
-  };
+  const handleGoHome = () => navigate("/");
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-xl shadow-md w-full max-w-md text-center relative">
-        {/* Botón volver al inicio */}
         <button
           onClick={handleGoHome}
           className="absolute top-4 left-4 text-gray-500 hover:text-blue-600 text-xl"
@@ -71,7 +71,9 @@ function Login() {
         </p>
 
         <form className="flex flex-col gap-4 mb-6" onSubmit={handleSubmit}>
-          <label htmlFor="email" className="text-left text-gray-500">Correo electrónico</label>
+          <label htmlFor="email" className="text-left text-gray-500">
+            Correo electrónico
+          </label>
           <input
             type="email"
             placeholder="Correo electrónico"
@@ -81,7 +83,9 @@ function Login() {
             required
           />
 
-          <label htmlFor="password" className="text-left text-gray-500">Contraseña</label>
+          <label htmlFor="password" className="text-left text-gray-500">
+            Contraseña
+          </label>
           <input
             type="password"
             placeholder="Contraseña"
@@ -100,14 +104,48 @@ function Login() {
               />
               Recuérdame
             </label>
-            <a href="#" className="text-blue-500 hover:underline">¿Olvidaste tu contraseña?</a>
+            <a href="#" className="text-blue-500 hover:underline">
+              ¿Olvidaste tu contraseña?
+            </a>
           </div>
 
+          {/* 🔹 Botón dinámico */}
           <button
             type="submit"
-            className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition-colors mt-2"
+            disabled={isLoading}
+            className={`flex items-center justify-center gap-2 py-2 rounded-lg transition-colors mt-2 ${
+              isLoading
+                ? "bg-blue-300 cursor-not-allowed"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
           >
-            Iniciar sesión
+            {isLoading ? (
+              <>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  ></path>
+                </svg>
+                <span className="text-white/80">Iniciando sesión...</span>
+              </>
+            ) : (
+              "Iniciar sesión"
+            )}
           </button>
 
           {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
@@ -125,7 +163,9 @@ function Login() {
             className="flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors"
           >
             <FcGoogle size={24} />
-            <span className="text-gray-700 font-medium">Iniciar sesión con Google</span>
+            <span className="text-gray-700 font-medium">
+              Iniciar sesión con Google
+            </span>
           </a>
 
           <a
@@ -133,7 +173,9 @@ function Login() {
             className="flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors"
           >
             <FaFacebookF size={20} className="text-blue-600" />
-            <span className="text-gray-700 font-medium">Iniciar sesión con Facebook</span>
+            <span className="text-gray-700 font-medium">
+              Iniciar sesión con Facebook
+            </span>
           </a>
 
           <a
@@ -141,13 +183,17 @@ function Login() {
             className="flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-100 transition-colors"
           >
             <FaApple size={20} />
-            <span className="text-gray-700 font-medium">Iniciar sesión con Apple</span>
+            <span className="text-gray-700 font-medium">
+              Iniciar sesión con Apple
+            </span>
           </a>
         </div>
 
         <p className="text-gray-600 text-sm mt-6">
           ¿No tienes una cuenta?{" "}
-          <Link to="/register" className="text-blue-500 hover:underline">Regístrate aquí</Link>
+          <Link to="/register" className="text-blue-500 hover:underline">
+            Regístrate aquí
+          </Link>
         </p>
       </div>
     </div>
@@ -155,4 +201,3 @@ function Login() {
 }
 
 export default Login;
-
