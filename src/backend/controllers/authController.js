@@ -1,90 +1,182 @@
-import { authServices } from "../services/authServices.js";
-import { generateToken } from "../utils/auth.js";
-
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+import prisma from "../prismaClient.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
+import { sendEmail } from "../services/emailService.js";
 
 export const authControllers = {
-  async register(req, res) {
+  register: async (req, res) => {
     try {
       const { email, name, password } = req.body;
 
-      if (!email || !name || !password) {
-        return res.status(400).json({
-          success: false,
-          message: "Todos los campos son obligatorios",
-        });
+      const userExists = await prisma.user.findUnique({ where: { email } });
+      if (userExists) {
+        return res
+          .status(400)
+          .json({ success: false, message: "El correo ya está registrado" });
       }
 
-      const result = await authServices.register({ email, name, password });
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const newUser = await prisma.user.create({
+        data: { email, name, password: hashedPassword },
+      });
 
       return res.status(201).json({
         success: true,
-        message: "Usuario registrado exitosamente",
-        data: result,
+        message: "Usuario registrado correctamente",
+        data: newUser,
       });
-    } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: error.message || "Error en el registro",
-      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: "Error interno" });
     }
   },
 
-  async login(req, res) {
+  login: async (req, res) => {
     try {
       const { email, password } = req.body;
 
-      if (!email || !password) {
-        return res.status(400).json({
-          success: false,
-          message: "Email y contraseña son obligatorios",
-        });
+      const user = await prisma.user.findUnique({ where: { email } });
+      if (!user || !user.password) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Credenciales incorrectas" });
       }
 
-      const result = await authServices.login({ email, password });
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid) {
+        return res
+          .status(401)
+          .json({ success: false, message: "Credenciales incorrectas" });
+      }
 
-      return res.status(200).json({
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      return res.json({
         success: true,
         message: "Inicio de sesión exitoso",
-        data: result,
+        data: {
+          token,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            avatar: user.avatar,
+          },
+        },
       });
-    } catch (error) {
-      return res.status(401).json({
-        success: false,
-        message: error.message || "Credenciales inválidas",
-      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: "Error interno" });
     }
   },
 
-  async googleCallBack(req, res) {
+  googleCallBack: async (req, res) => {
     try {
       const user = req.user;
 
+      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+        expiresIn: "7d",
+      });
+
+      const redirectUrl =
+        `http://localhost:5173/login-success?token=${token}` +
+        `&name=${encodeURIComponent(user.name || "")}` +
+        `&email=${encodeURIComponent(user.email || "")}` +
+        `&avatar=${encodeURIComponent(user.avatar || "")}`;
+
+      res.redirect(redirectUrl);
+    } catch (err) {
+      console.error(err);
+      res.redirect("http://localhost:5173/login-error");
+    }
+  },
+
+  forgotPassword: async (req, res) => {
+    try {
+      const { email } = req.body;
+
+      const user = await prisma.user.findUnique({ where: { email } });
       if (!user) {
-        return res.redirect(`${FRONTEND_URL}/login-error`);
+        return res.json({
+          success: true,
+          message: "Si el correo existe, se envió un enlace",
+        });
       }
 
-      const redirect = req.query.redirect || "/login-success";
-      const token = generateToken(user.id, user.email);
-      const safe = (val) =>
-        val && val !== "null" && val !== "undefined" ? val : "";
+      const token = crypto.randomBytes(32).toString("hex");
 
-      const redirectURL =
-        `${FRONTEND_URL}${redirect}` +
-        `?token=${encodeURIComponent(token)}` +
-        `&name=${encodeURIComponent(safe(user.name))}` +
-        `&email=${encodeURIComponent(safe(user.email))}` +
-        `&avatar=${encodeURIComponent(safe(user.avatar))}`;
+      await prisma.user.update({
+        where: { email },
+        data: {
+          resetToken: token,
+          resetTokenExpires: new Date(Date.now() + 1000 * 60 * 30),
+        },
+      });
 
-      return res.redirect(redirectURL);
-    } catch (error) {
-      console.error("❌ ERROR CALLBACK GOOGLE:", error);
+      const resetLink = `http://localhost:5173/reset-password/${token}`;
+      await sendEmail(email, user.name, resetLink);
 
-      return res.redirect(
-        `${FRONTEND_URL}/login-error?message=${encodeURIComponent(
-          error.message || "Error al autenticar con Google"
-        )}`
-      );
+      return res.json({
+        success: true,
+        message: "Se envió un enlace de recuperación a tu correo",
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ success: false, message: "Error interno" });
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    try {
+      const { token, newPassword } = req.body;
+      console.log("TOKEN RECIBIDO:", token);
+      console.log("NUEVA CONTRASEÑA:", newPassword);
+
+      if (!token || !newPassword) {
+        return res.status(400).json({
+          success: false,
+          message: "Datos incompletos",
+        });
+      }
+
+      const user = await prisma.user.findFirst({
+        where: {
+          resetToken: token,
+          resetTokenExpires: { gt: new Date() },
+        },
+      });
+
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: "Enlace inválido o expirado",
+        });
+      }
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          password: hashedPassword,
+          resetToken: null, // ← CAMBIO IMPORTANTE
+          resetTokenExpires: null,
+        },
+      });
+
+      console.log("PASSWORD ACTUALIZADA CORRECTAMENTE");
+
+      return res.json({
+        success: true,
+        message: "Contraseña actualizada correctamente",
+      });
+    } catch (err) {
+      console.error("RESET ERROR:", err);
+      return res.status(500).json({ success: false, message: "Error interno" });
     }
   },
 };
