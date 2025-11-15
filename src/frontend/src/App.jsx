@@ -24,6 +24,8 @@ import ProductosPorMarca from "./pages/ProductosPorMarca";
 import SoporteVista from "./pages/SoporteVista";
 import VistaOferta from "./pages/VistaOferta";
 import LoginSuccess from "./pages/LoginSuccess";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import { Toaster } from "react-hot-toast";
 
@@ -82,6 +84,8 @@ function App() {
             element={!token ? <Register /> : <Navigate to="/" replace />}
           />
           <Route path="/login-success" element={<LoginSuccess />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/carrito" element={<CarritoVista />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/productos-vista" element={<ProductosVista />} />

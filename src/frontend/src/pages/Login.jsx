@@ -9,12 +9,14 @@ function Login() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
 
   const { login, token } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const GOOGLE_AUTH_URL = `${import.meta.env.VITE_GOOGLE_AUTH_URL}?redirect=/login-success`;
+  const GOOGLE_AUTH_URL = `${
+    import.meta.env.VITE_GOOGLE_AUTH_URL
+  }?redirect=/login-success`;
   const FACEBOOK_AUTH_URL = "#";
   const APPLE_AUTH_URL = "#";
 
@@ -42,7 +44,7 @@ function Login() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -103,9 +105,9 @@ function Login() {
               />
               Recuérdame
             </label>
-            <a href="#" className="text-blue-500 hover:underline">
+            <Link to="/forgot-password" className="link-olvido">
               ¿Olvidaste tu contraseña?
-            </a>
+            </Link>
           </div>
 
           {/* 🔹 Botón dinámico */}
