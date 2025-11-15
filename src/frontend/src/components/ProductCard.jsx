@@ -4,12 +4,18 @@ import { useCompare } from "../context/CompareContext";
 import toast from "react-hot-toast";
 
 export default function ProductCard({ product }) {
-  const { addToCart } = useCart();
-  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+  const { addToCart, cart } = useCart();
+  const { addToCompare, removeFromCompare, isInCompare, compareList } = useCompare();
 
   if (!product) return null;
 
   const enComparacion = isInCompare(product.id);
+
+  const itemEnCarrito = cart.find((item) => item.id === product.id);
+  const cantidadActual = itemEnCarrito ? itemEnCarrito.quantity : 0;
+  const sinStock = product.stock === 0;
+  const maxAlcanzado = cantidadActual >= product.stock;
+  const deshabilitado = sinStock || maxAlcanzado;
 
   const handleCompare = () => {
     if (enComparacion) {
@@ -39,7 +45,19 @@ export default function ProductCard({ product }) {
   };
 
   const handleAddToCart = () => {
-    if (product.stock === 0) return;
+    if (deshabilitado) {
+      toast.error("No hay stock disponible 😢", {
+        position: "bottom-right",
+        style: {
+          background: "#dc2626",
+          color: "#fff",
+          borderRadius: "10px",
+          padding: "10px 15px",
+        },
+      });
+      return;
+    }
+
     addToCart(product);
     toast.success(`🛒 ${product.name} agregado al carrito`, {
       position: "bottom-right",
@@ -73,19 +91,16 @@ export default function ProductCard({ product }) {
 
   return (
     <div className="rounded-2xl shadow p-4 bg-white relative flex flex-col justify-between h-full transition-transform duration-200 hover:scale-[1.02]">
-      {/* Etiquetas */}
       {product.oferta && (
         <span className="absolute top-10 left-8 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
           Oferta
         </span>
       )}
-      {product.stock === 0 && (
+      {sinStock && (
         <span className="absolute top-3 right-3 bg-gray-400 text-white text-xs font-bold px-2 py-1 rounded-md">
           Agotado
         </span>
       )}
-
-      {/* Imagen */}
       <div className="flex justify-center items-center h-48">
         <img
           src={`http://localhost:3000${product.imageUrl}`}
@@ -95,7 +110,6 @@ export default function ProductCard({ product }) {
         />
       </div>
 
-      {/* Info */}
       <div className="mt-3 flex flex-col flex-grow justify-between text-center">
         <div>
           <h3 className="font-semibold text-lg">{product.name}</h3>
@@ -103,7 +117,6 @@ export default function ProductCard({ product }) {
           <p className="text-sm text-gray-500 mt-1">{product.description}</p>
         </div>
 
-        {/* Precio */}
         <div className="mt-2 flex items-center justify-center gap-2">
           <span className="font-bold text-lg text-gray-800">
             ${product.price}
@@ -115,33 +128,43 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {/* Botones */}
         <div className="mt-3 flex justify-center gap-2">
           <button
             onClick={handleCompare}
+            disabled={!enComparacion && compareList.length >= 4}
             className={`flex items-center gap-1 border rounded-lg px-3 py-1 text-sm transition font-medium ${
               enComparacion
                 ? "bg-blue-600 text-white hover:bg-blue-700"
+                : compareList.length >= 4
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "hover:bg-gray-100 text-gray-800"
             }`}
           >
-            {enComparacion ? "En comparación ✅" : "Comparar ⚖️"}
+            {enComparacion
+              ? "En comparación ✅"
+              : compareList.length >= 4
+              ? "Límite alcanzado ⚠️"
+              : "Comparar ⚖️"}
           </button>
+
           <button
-            disabled={product.stock === 0}
             onClick={handleAddToCart}
+            disabled={deshabilitado}
             className={`flex items-center gap-1 rounded-lg px-3 py-1 text-sm text-white ${
-              product.stock === 0
+              deshabilitado
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             <ShoppingCart size={16} />
-            {product.stock === 0 ? "Agotado" : "Agregar"}
+            {sinStock
+              ? "Agotado"
+              : maxAlcanzado
+              ? "Límite alcanzado"
+              : "Agregar"}
           </button>
         </div>
       </div>
     </div>
   );
 }
-

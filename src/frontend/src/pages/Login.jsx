@@ -1,4 +1,3 @@
-// pages/Login.jsx
 import { useState, useContext } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -10,19 +9,19 @@ function Login() {
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // 🔹 Nuevo estado de carga
+  const [isLoading, setIsLoading] = useState(false); 
 
   const { login, token } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const GOOGLE_AUTH_URL = import.meta.env.VITE_GOOGLE_AUTH_URL;
+  const GOOGLE_AUTH_URL = `${import.meta.env.VITE_GOOGLE_AUTH_URL}?redirect=/login-success`;
   const FACEBOOK_AUTH_URL = "#";
   const APPLE_AUTH_URL = "#";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setIsLoading(true); // 🔹 Activamos el estado de carga
+    setIsLoading(true);
 
     try {
       const res = await fetch("http://localhost:3000/api/auth/login", {
@@ -43,7 +42,7 @@ function Login() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setIsLoading(false); // 🔹 Terminamos el estado de carga
+      setIsLoading(false); 
     }
   };
 

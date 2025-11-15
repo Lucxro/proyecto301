@@ -6,11 +6,16 @@ import toast from "react-hot-toast";
 
 export default function ProductCardModern({ product }) {
   const navigate = useNavigate();
-  const { addToCart } = useCart();
-  const { addToCompare, removeFromCompare, isInCompare } = useCompare();
+  const { addToCart, cart } = useCart();
+  const { addToCompare, removeFromCompare, isInCompare, compareList } = useCompare();
 
   const inCompare = isInCompare(product.id);
-  const isAgotado = product.stock === 0;
+
+  const itemEnCarrito = cart.find((item) => item.id === product.id);
+  const cantidadEnCarrito = itemEnCarrito ? itemEnCarrito.quantity : 0;
+  const sinStock = product.stock === 0;
+  const maxAlcanzado = cantidadEnCarrito >= product.stock;
+  const isAgotado = sinStock || maxAlcanzado;
 
   const handleCompare = () => {
     if (inCompare) {
@@ -24,20 +29,34 @@ export default function ProductCardModern({ product }) {
 
   const handleAddToCart = () => {
     if (isAgotado) {
-      toast.error("Producto sin stock 😢");
+      toast.error("No hay stock disponible 😢", {
+        position: "bottom-right",
+        style: {
+          background: "#dc2626",
+          color: "#fff",
+          borderRadius: "10px",
+          padding: "10px 15px",
+        },
+      });
       return;
     }
+
     addToCart(product);
-    toast.success("Producto agregado al carrito 🛒");
+    toast.success("Producto agregado al carrito 🛒", {
+      position: "bottom-right",
+      style: {
+        background: "#2563eb",
+        color: "#fff",
+        borderRadius: "10px",
+        padding: "10px 15px",
+      },
+    });
   };
 
   const handleView = () => navigate(`/producto/${product.id}`);
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden shadow-md bg-white flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border hover:border-blue-200"
-    >
-      {/* Imagen */}
+    <div className="rounded-2xl overflow-hidden shadow-md bg-white flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-1 hover:border hover:border-blue-200">
       <div className="relative w-full h-56 bg-gray-50 flex items-center justify-center">
         {product.oferta && (
           <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-md shadow">
@@ -66,9 +85,7 @@ export default function ProductCardModern({ product }) {
         />
       </div>
 
-      {/* Info */}
       <div className="flex flex-col justify-between flex-grow p-4">
-        {/* Rating */}
         <div className="flex justify-center items-center gap-1 text-yellow-400 mb-1">
           {Array.from({ length: 5 }).map((_, i) => (
             <Star
@@ -81,27 +98,21 @@ export default function ProductCardModern({ product }) {
               }
             />
           ))}
-          <span className="text-gray-600 text-sm">
-            ({product.rating || 0})
-          </span>
+          <span className="text-gray-600 text-sm">({product.rating || 0})</span>
         </div>
 
-        {/* Nombre */}
         <h3 className="font-semibold text-base text-gray-800 leading-tight mb-1 text-center">
           {product.name}
         </h3>
 
-        {/* Specs */}
         <p className="text-sm text-gray-500 mb-1 text-center">
           {product.almacenamiento} • {product.ram} • {product.sistema}
         </p>
 
-        {/* Descripción */}
         <p className="text-sm text-gray-600 line-clamp-2 mb-3 text-center">
           {product.description}
         </p>
 
-        {/* Precio */}
         <div className="flex justify-center items-center gap-2 mb-3">
           {product.oferta && product.oldPrice ? (
             <>
@@ -119,7 +130,6 @@ export default function ProductCardModern({ product }) {
           )}
         </div>
 
-        {/* Botón principal: Agregar */}
         <button
           onClick={handleAddToCart}
           disabled={isAgotado}
@@ -130,10 +140,13 @@ export default function ProductCardModern({ product }) {
           }`}
         >
           <ShoppingCart size={16} />
-          {isAgotado ? "Sin stock" : "Agregar al carrito"}
+          {sinStock
+            ? "Sin stock"
+            : maxAlcanzado
+            ? "Límite alcanzado"
+            : "Agregar al carrito"}
         </button>
 
-        {/* Botones secundarios: Ver y Comparar */}
         <div className="flex justify-center gap-2">
           <button
             onClick={handleView}
@@ -144,14 +157,21 @@ export default function ProductCardModern({ product }) {
 
           <button
             onClick={handleCompare}
+            disabled={!inCompare && compareList.length >= 4}
             className={`flex justify-center items-center gap-1 border rounded-lg px-3 py-1.5 text-sm font-medium transition-all duration-300 w-full ${
               inCompare
                 ? "bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg"
+                : compareList.length >= 4
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                 : "hover:bg-gray-100 text-gray-800"
             }`}
           >
             <Scale size={16} />
-            {inCompare ? "Comparando" : "Comparar"}
+            {inCompare
+              ? "Comparando"
+              : compareList.length >= 4
+              ? "Límite ⚠️"
+              : "Comparar"}
           </button>
         </div>
       </div>

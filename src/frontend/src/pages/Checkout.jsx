@@ -37,8 +37,14 @@ export default function Checkout() {
     cvv: "",
   });
 
-  const costoEnvio = subtotal > 500 ? 0 : 20;
-  const total = subtotal + costoEnvio;
+  // Recuperar descuento y envío gratis guardados desde el carrito
+  const promo = JSON.parse(localStorage.getItem("promo") || "{}");
+  const discount = promo.discount || 0;
+  const freeShipping = promo.freeShipping || false;
+
+  // Calcular costo de envío y total con descuento aplicado
+  const costoEnvio = freeShipping || subtotal > 500 ? 0 : 20;
+  const total = (subtotal - subtotal * discount) + costoEnvio;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -78,6 +84,8 @@ export default function Checkout() {
           ...form,
           metodoPago: pago,
           total,
+          descuentoAplicado: discount,
+          envioGratis: freeShipping,
           productos: cart.map((p) => ({
             nombre: p.name,
             cantidad: p.quantity,
@@ -92,7 +100,11 @@ export default function Checkout() {
       const data = await response.json();
       setOrderId(data.id || Math.floor(Math.random() * 1000000));
       setMensaje("✅ Orden registrada con éxito. ¡Gracias por tu compra!");
+
+      // Limpiar carrito y promoción al finalizar la compra
       clearCart();
+      localStorage.removeItem("promo");
+
       setStep(3);
     } catch (error) {
       console.error(error);
@@ -171,14 +183,7 @@ export default function Checkout() {
                 }}
                 className="space-y-4"
               >
-                {[
-                  "nombre",
-                  "apellido",
-                  "celular",
-                  "correo",
-                  "ciudad",
-                  "direccion",
-                ].map((campo) => (
+                {["nombre", "apellido", "celular", "correo", "ciudad", "direccion"].map((campo) => (
                   <div key={campo}>
                     <label className="block text-sm font-medium text-gray-600 capitalize">
                       {campo}
@@ -205,7 +210,7 @@ export default function Checkout() {
                     type="submit"
                     className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
                   >
-                    Continuar a Pago 💳
+                    Continuar con el Pago 💳
                   </button>
                 </div>
               </form>
@@ -229,8 +234,16 @@ export default function Checkout() {
               <p className="text-gray-700 mb-4 text-base">
                 <span className="font-semibold text-blue-600">Total a pagar:</span>{" "}
                 S/ {total.toFixed(2)}{" "}
-                {costoEnvio > 0 ? "(Incluye envío S/ 20.00)" : "(Envío gratis 🚚)"}
+                {costoEnvio > 0
+                  ? "(Incluye envío S/ 20.00)"
+                  : "(Envío gratis 🚚)"}
               </p>
+
+              {discount > 0 && (
+                <p className="text-green-600 mb-4 text-sm">
+                  💰 Descuento aplicado: -{(discount * 100).toFixed(0)}%
+                </p>
+              )}
 
               <div className="space-y-4">
                 {[
@@ -268,7 +281,6 @@ export default function Checkout() {
                 ))}
               </div>
 
-              {/* Formulario adicional para Tarjeta */}
               {pago === "tarjeta" && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}

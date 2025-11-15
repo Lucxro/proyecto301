@@ -16,21 +16,18 @@ function Navbar() {
   const [resultados, setResultados] = useState([]);
   const navigate = useNavigate();
 
-  // 🧩 Obtener productos desde la API
+  // Obtener productos desde la API
   useEffect(() => {
     const obtenerProductos = async () => {
       try {
         const res = await fetch("http://localhost:3000/api/products");
         const data = await res.json();
 
-        console.log("📦 Productos desde API:", data);
-
         if (Array.isArray(data)) {
           setProductos(data);
         } else if (Array.isArray(data.products)) {
           setProductos(data.products);
         } else {
-          console.error("⚠️ La API no devolvió un arreglo:", data);
           setProductos([]);
         }
       } catch (error) {
@@ -42,7 +39,7 @@ function Navbar() {
     obtenerProductos();
   }, []);
 
-  // 🔍 Filtrar productos al escribir en el input
+  // Filtrar productos al escribir
   useEffect(() => {
     if (busqueda.trim() === "") {
       setResultados([]);
@@ -53,10 +50,10 @@ function Navbar() {
       p.nombre?.toLowerCase().includes(busqueda.toLowerCase())
     );
 
-    setResultados(filtrados.slice(0, 5)); // Muestra solo los primeros 5
+    setResultados(filtrados.slice(0, 5));
   }, [busqueda, productos]);
 
-  // 🛒 Animación carrito
+  // Animación carrito
   useEffect(() => {
     if (cart.length > 0) {
       setCartAnimation(true);
@@ -69,14 +66,16 @@ function Navbar() {
     navigate(token ? "/carrito" : "/login");
   };
 
+  // Inicial del usuario
   const userInitial =
     user?.name?.charAt(0)?.toUpperCase() ||
-    user?.email?.[0]?.toUpperCase() ||
+    user?.email?.charAt(0)?.toUpperCase() ||
     "U";
 
   return (
     <header className="bg-gray-200 shadow-md fixed w-full top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center relative">
+        
         {/* Logo */}
         <div className="flex items-center space-x-2">
           <Link
@@ -89,6 +88,7 @@ function Navbar() {
 
         {/* 🔹 Iconos móviles */}
         <div className="flex items-center space-x-4 md:hidden">
+
           {/* Carrito */}
           <div className="relative cursor-pointer" onClick={handleCarritoClick}>
             <img
@@ -105,33 +105,52 @@ function Navbar() {
             )}
           </div>
 
-          {/* Usuario logueado */}
+          {/* Usuario móvil */}
           {token && (
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-semibold flex items-center justify-center hover:bg-gray-300 transition"
+                className="w-8 h-8 rounded-full bg-gray-100 text-gray-700 font-semibold flex items-center justify-center hover:bg-gray-300 transition overflow-hidden"
               >
-                {userInitial}
+                <div className="relative w-8 h-8">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt="Avatar"
+                      className="w-8 h-8 object-cover rounded-full"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        const fallback =
+                          e.target.parentNode.querySelector("#fallbackMobile");
+                        if (fallback) fallback.style.display = "flex";
+                      }}
+                    />
+                  ) : null}
+
+                  <div
+                    id="fallbackMobile"
+                    className={`${
+                      user?.avatar ? "hidden" : "flex"
+                    } w-8 h-8 bg-gray-900 text-white rounded-full items-center justify-center font-bold`}
+                  >
+                    {userInitial}
+                  </div>
+                </div>
               </button>
 
               {/* Menú usuario móvil */}
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border z-50">
                   <div className="px-4 py-2 border-b">
-                    <p className="text-sm font-semibold text-gray-800 truncate">
-                      {user?.name || "Usuario"}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {user?.email}
-                    </p>
+                    <p className="text-sm font-semibold truncate">{user?.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </div>
                   <button
                     onClick={() => {
                       navigate("/perfil");
                       setIsUserMenuOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
                   >
                     Perfil
                   </button>
@@ -140,7 +159,7 @@ function Navbar() {
                       navigate("/mis-pedidos");
                       setIsUserMenuOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                    className="block w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
                   >
                     Mis pedidos
                   </button>
@@ -164,34 +183,12 @@ function Navbar() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
             {isMobileMenuOpen ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-7 w-7"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
@@ -199,38 +196,29 @@ function Navbar() {
 
         {/* 🔹 Menú desktop */}
         <nav className="hidden md:flex space-x-8 text-gray-700 flex-grow justify-center">
-          <Link to="/productos-vista" className="hover:text-blue-600">
-            Productos
-          </Link>
-          <Link to="#" className="hover:text-blue-600">
-            Comparar
-          </Link>
-          <Link to="#" className="hover:text-blue-600">
-            Marcas
-          </Link>
-          <Link to="#" className="hover:text-blue-600">
-            Ofertas
-          </Link>
-          <Link to="#" className="hover:text-blue-600">
-            Soporte
-          </Link>
+          <Link to="/productos-vista" className="hover:text-blue-600">Productos</Link>
+          <Link to="/comparar" className="hover:text-blue-600">Comparar</Link>
+          <Link to="/marcas" className="hover:text-blue-600">Marcas</Link>
+          <Link to="/ofertas" className="hover:text-blue-600">Ofertas</Link>
+          <Link to="/soporte" className="hover:text-blue-600">Soporte</Link>
         </nav>
 
         {/* 🔹 Área derecha desktop */}
         <div className="hidden md:flex items-center space-x-4 relative">
-          {/* Input de búsqueda */}
+
+          {/* Input búsqueda */}
           <div className="relative">
             <input
               type="text"
               placeholder="Buscar celulares..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
-              className="border rounded-lg px-3 py-1 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border rounded-lg px-3 py-1 text-sm w-56 focus:ring-2 focus:ring-blue-500"
             />
 
             {/* Resultados */}
             {resultados.length > 0 && (
-              <div className="absolute top-10 left-0 bg-white border border-gray-200 rounded-lg shadow-lg w-full max-h-60 overflow-y-auto z-50">
+              <div className="absolute top-10 left-0 bg-white border rounded-lg shadow-lg w-full max-h-60 overflow-y-auto z-50">
                 {resultados.map((p) => (
                   <button
                     key={p.id}
@@ -239,7 +227,7 @@ function Navbar() {
                       setBusqueda("");
                       setResultados([]);
                     }}
-                    className="w-full text-left px-3 py-2 hover:bg-blue-50 transition text-sm"
+                    className="w-full text-left px-3 py-2 hover:bg-blue-50 text-sm"
                   >
                     {p.nombre}
                   </button>
@@ -253,39 +241,60 @@ function Navbar() {
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="w-9 h-9 rounded-full bg-gray-100 text-gray-700 font-semibold flex items-center justify-center hover:bg-gray-300 transition"
+                className="w-9 h-9 rounded-full bg-gray-100 text-gray-700 font-semibold flex items-center justify-center hover:bg-gray-300 transition overflow-hidden"
               >
-                {userInitial}
+                <div className="relative w-9 h-9">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      className="w-9 h-9 object-cover rounded-full"
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        const fallback =
+                          e.target.parentNode.querySelector("#fallbackDesktop");
+                        if (fallback) fallback.style.display = "flex";
+                      }}
+                    />
+                  ) : null}
+
+                  <div
+                    id="fallbackDesktop"
+                    className={`${
+                      user?.avatar ? "hidden" : "flex"
+                    } w-9 h-9 bg-gray-900 text-white rounded-full items-center justify-center font-bold`}
+                  >
+                    {userInitial}
+                  </div>
+                </div>
               </button>
 
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-lg border z-50">
                   <div className="px-4 py-2 border-b">
-                    <p className="text-sm font-semibold text-gray-800 truncate">
-                      {user?.name || "Usuario"}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate">
-                      {user?.email}
-                    </p>
+                    <p className="text-sm font-semibold truncate">{user?.name}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                   </div>
+
                   <button
                     onClick={() => {
                       navigate("/perfil");
                       setIsUserMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
                   >
                     Perfil
                   </button>
+
                   <button
                     onClick={() => {
                       navigate("/mis-pedidos");
                       setIsUserMenuOpen(false);
                     }}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-blue-50"
+                    className="w-full text-left px-4 py-2 text-sm hover:bg-blue-50"
                   >
                     Mis pedidos
                   </button>
+
                   <button
                     onClick={() => {
                       logout();
@@ -300,16 +309,10 @@ function Navbar() {
             </div>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="text-gray-700 text-sm hover:bg-green-600 hover:text-white px-3 py-1 rounded transition"
-              >
+              <Link to="/login" className="text-sm hover:bg-green-600 hover:text-white px-3 py-1 rounded">
                 Iniciar sesión
               </Link>
-              <Link
-                to="/register"
-                className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 transition"
-              >
+              <Link to="/register" className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500">
                 Registrarse
               </Link>
             </>
@@ -333,88 +336,92 @@ function Navbar() {
         </div>
       </div>
 
-      {/* Overlay oscuro */}
+      {/* Overlay móvil */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm z-40 transition-opacity duration-300"
+          className="fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm z-40"
           onClick={() => setIsMobileMenuOpen(false)}
         ></div>
       )}
 
       {/* Menú móvil */}
       <div
-        className={`md:hidden bg-white border-t border-gray-300 shadow-md absolute w-full left-0 transition-all duration-300 ease-in-out z-50 ${
+        className={`md:hidden bg-white border-t shadow-md absolute w-full left-0 transition-all duration-300 z-50 ${
           isMobileMenuOpen
             ? "max-h-[500px] opacity-100"
             : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
         <nav className="flex flex-col items-start px-6 py-4 space-y-3 text-gray-700">
-          {[{ name: "Productos", path: "/productos-vista" },
-            { name: "Comparar", path: "#" },
-            { name: "Marcas", path: "#" },
-            { name: "Ofertas", path: "#" },
-            { name: "Soporte", path: "#" }].map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="w-full py-2 px-3 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-all duration-150 active:scale-95"
-              >
-                {item.name}
-              </Link>
+          
+          {[
+            { name: "Productos", path: "/productos-vista" },
+            { name: "Comparar", path: "/comparar" },
+            { name: "Marcas", path: "/marcas" },
+            { name: "Ofertas", path: "/ofertas" },
+            { name: "Soporte", path: "/soporte" },
+          ].map((item) => (
+            <Link
+              key={item.name}
+              to={item.path}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="w-full py-2 px-3 rounded-md hover:bg-blue-50 hover:text-blue-600"
+            >
+              {item.name}
+            </Link>
           ))}
 
-          {/* 🔹 Menú usuario móvil */}
+          {/* Usuario móvil */}
           {token ? (
-            <div className="mt-3 border-t border-gray-200 w-full pt-3">
+            <div className="mt-3 border-t w-full pt-3">
               <div className="px-4 py-2 border-b">
-                <p className="text-sm font-semibold text-gray-800 truncate">
-                  {user?.name || "Usuario"}
-                </p>
+                <p className="text-sm font-semibold truncate">{user?.name}</p>
                 <p className="text-xs text-gray-500 truncate">{user?.email}</p>
               </div>
+
               <button
                 onClick={() => {
                   navigate("/perfil");
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left py-2 px-3 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-all duration-150"
+                className="block w-full py-2 px-3 text-left rounded-md hover:bg-blue-50"
               >
                 Perfil
               </button>
+
               <button
                 onClick={() => {
                   navigate("/mis-pedidos");
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left py-2 px-3 rounded-md hover:bg-blue-50 hover:text-blue-600 transition-all duration-150"
+                className="block w-full py-2 px-3 text-left rounded-md hover:bg-blue-50"
               >
                 Mis pedidos
               </button>
+
               <button
                 onClick={() => {
                   logout();
                   setIsMobileMenuOpen(false);
                 }}
-                className="block w-full text-left py-2 px-3 rounded-md text-red-600 hover:bg-red-50 transition-all duration-150"
+                className="block w-full py-2 px-3 text-left text-red-600 rounded-md hover:bg-red-50"
               >
                 Cerrar sesión
               </button>
             </div>
           ) : (
-            <div className="mt-4 border-t border-gray-200 w-full pt-3 space-y-2">
+            <div className="mt-4 border-t w-full pt-3 space-y-2">
               <Link
                 to="/login"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-center py-2 px-3 rounded-md bg-green-600 text-white font-medium hover:bg-green-500 transition-all duration-150"
+                className="block w-full py-2 px-3 text-center rounded-md bg-green-600 text-white hover:bg-green-500"
               >
                 Iniciar sesión
               </Link>
               <Link
                 to="/register"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block w-full text-center py-2 px-3 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-500 transition-all duration-150"
+                className="block w-full py-2 px-3 text-center rounded-md bg-blue-600 text-white hover:bg-blue-500"
               >
                 Registrarse
               </Link>
@@ -427,4 +434,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

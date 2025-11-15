@@ -23,23 +23,41 @@ export default function Carrito() {
   const subtotal = calcularSubtotal();
   const total = (subtotal - subtotal * discount).toFixed(2);
 
-  const aplicarCodigo = () => {
-    const codigo = promoCode.trim().toLowerCase();
+const aplicarCodigo = () => {
+  const codigo = promoCode.trim().toLowerCase();
 
-    if (codigo === "descuento10") {
-      setDiscount(0.1);
-      setFreeShipping(false);
-      setMessage("✅ Se aplicó un 10% de descuento.");
-    } else if (codigo === "enviogratis") {
-      setDiscount(0);
-      setFreeShipping(true);
-      setMessage("🚚 Envío gratis aplicado.");
-    } else {
-      setDiscount(0);
-      setFreeShipping(false);
-      setMessage("❌ Código inválido.");
-    }
-  };
+  if (codigo === "descuento10") {
+    setDiscount(0.1);
+    setFreeShipping(false);
+    setMessage("✅ Se aplicó un 10% de descuento.");
+
+    // 👉 Guardar en localStorage
+    localStorage.setItem("promo", JSON.stringify({
+      code: codigo,
+      discount: 0.1,
+      freeShipping: false
+    }));
+
+  } else if (codigo === "enviogratis") {
+    setDiscount(0);
+    setFreeShipping(true);
+    setMessage("🚚 Envío gratis aplicado.");
+
+    localStorage.setItem("promo", JSON.stringify({
+      code: codigo,
+      discount: 0,
+      freeShipping: true
+    }));
+
+  } else {
+    setDiscount(0);
+    setFreeShipping(false);
+    setMessage("❌ Código inválido.");
+
+    localStorage.removeItem("promo");
+  }
+};
+
 
   if (cart.length === 0) {
     return (
@@ -122,7 +140,17 @@ export default function Carrito() {
                       onClick={() =>
                         updateQuantity(item.id, (item.quantity || 1) + 1)
                       }
-                      className="px-3 py-1 text-lg text-gray-600 hover:bg-gray-200 transition"
+                      disabled={item.quantity >= item.stock}
+                      className={`px-3 py-1 text-lg transition ${
+                        item.quantity >= item.stock
+                          ? "text-gray-400 cursor-not-allowed"
+                          : "text-gray-600 hover:bg-gray-200"
+                      }`}
+                      title={
+                        item.quantity >= item.stock
+                          ? `Stock máximo (${item.stock}) alcanzado`
+                          : "Aumentar cantidad"
+                      }
                     >
                       +
                     </button>
@@ -216,11 +244,11 @@ export default function Carrito() {
           {/* Proceder al pago */}
           <button
             onClick={() => navigate("/checkout")}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+            className="bg-blue-600 text-white mt-2 px-4 py-2 rounded-lg"
           >
             💳 Proceder al pago
           </button>
-          
+
           <p className="text-xs text-center text-gray-500 mt-3">
             Envío gratis en compras mayores a $500
           </p>

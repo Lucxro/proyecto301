@@ -9,8 +9,55 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem("token");
-    const savedUser = localStorage.getItem("user");
+    console.log("Revisando URL para login con Google...");
+
+    const url = new URL(window.location.href);
+    const tokenFromUrl = url.searchParams.get("token");
+
+    // SI VIENE DEL LOGIN CON GOOGLE:
+    if (tokenFromUrl) {
+      console.log("Token recibido desde Google:", tokenFromUrl);
+
+      const safeValue = (v) =>
+        v && v !== "null" && v !== "undefined" ? v : "";
+
+      const name = safeValue(url.searchParams.get("name"));
+      const email = safeValue(url.searchParams.get("email"));
+      const avatar = safeValue(url.searchParams.get("avatar"));
+
+      const safe = (val) =>
+        val && val !== "null" && val !== "undefined" ? val : "";
+
+      const userData = {
+        name: safe(name),
+        email: safe(email),
+        avatar: safe(avatar),
+      };
+
+      console.log("Datos del usuario recibidos:", userData);
+
+      // Guardar en localStorage
+      localStorage.setItem("authToken", tokenFromUrl);
+      localStorage.setItem("userData", JSON.stringify(userData));
+
+      // Guardar en estado
+      setToken(tokenFromUrl);
+      setUser(userData);
+
+      // Limpiar la URL
+      window.history.replaceState({}, document.title, "/");
+
+      setLoading(false);
+      return;
+    }
+
+    // SI NO VIENE DE GOOGLE: cargar desde localStorage
+    console.log("Revisando localStorage...");
+    console.log("authToken guardado:", localStorage.getItem("authToken"));
+    console.log("userData guardado:", localStorage.getItem("userData"));
+
+    const savedToken = localStorage.getItem("authToken");
+    const savedUser = localStorage.getItem("userData");
 
     if (savedToken) {
       setToken(savedToken);
@@ -18,27 +65,31 @@ export const AuthProvider = ({ children }) => {
       setToken(null);
     }
 
-    if (savedUser) {
+    if (savedUser && savedUser !== "null" && savedUser !== "undefined") {
       try {
         setUser(JSON.parse(savedUser));
       } catch {
-        localStorage.removeItem("user");
+        console.error("Error leyendo userData, limpiando...");
+        localStorage.removeItem("userData");
       }
+    } else {
+      setUser(null);
     }
 
     setLoading(false);
   }, []);
 
   const login = (newToken, userData) => {
-    localStorage.setItem("token", newToken);
-    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("authToken", newToken);
+    localStorage.setItem("userData", JSON.stringify(userData));
+
     setToken(newToken);
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userData");
     setToken(null);
     setUser(null);
   };

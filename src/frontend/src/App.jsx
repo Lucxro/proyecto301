@@ -1,4 +1,10 @@
-import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "./context/AuthContext";
 
@@ -11,9 +17,14 @@ import Navbar from "./pages/Navbar";
 import { CartProvider } from "./context/CartContext";
 import { CompareProvider } from "./context/CompareContext";
 import CarritoVista from "./pages/CarritoVista";
-import Checkout from "./pages/Checkout"; 
+import Checkout from "./pages/Checkout";
+import CompararVista from "./pages/CompararVista";
+import MarcasVista from "./pages/MarcasVista";
+import ProductosPorMarca from "./pages/ProductosPorMarca";
+import SoporteVista from "./pages/SoporteVista";
+import VistaOferta from "./pages/VistaOferta";
+import LoginSuccess from "./pages/LoginSuccess";
 
-// 👇 Importa react-hot-toast
 import { Toaster } from "react-hot-toast";
 
 function App() {
@@ -34,15 +45,24 @@ function App() {
     const tokenParam = params.get("token");
     const message = params.get("message");
 
-    if (tokenParam) {
-      login(tokenParam);
+    if (tokenParam && !token) {
+      const name = params.get("name");
+      const email = params.get("email");
+      const avatar = params.get("avatar");
+
+      const userData = { name, email, avatar };
+
+      login(tokenParam, userData);
+
       navigate("/", { replace: true });
+      return; 
     }
+
     if (message && location.pathname === "/login") {
       alert("Error al iniciar sesión: " + message);
       navigate("/login", { replace: true });
     }
-  }, [location.search, location.pathname, login, navigate]);
+  }, [location.search, location.pathname, login, navigate, token]);
 
   if (loading) return <div>Cargando...</div>;
 
@@ -61,10 +81,16 @@ function App() {
             path="/register"
             element={!token ? <Register /> : <Navigate to="/" replace />}
           />
+          <Route path="/login-success" element={<LoginSuccess />} />
           <Route path="/carrito" element={<CarritoVista />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/productos-vista" element={<ProductosVista />} />
           <Route path="/producto/:id" element={<DetalleProducto />} />
+          <Route path="/comparar" element={<CompararVista />} />
+          <Route path="/marcas" element={<MarcasVista />} />
+          <Route path="/marca/:nombre" element={<ProductosPorMarca />} />
+          <Route path="/soporte" element={<SoporteVista />} />
+          <Route path="/ofertas" element={<VistaOferta />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
 
@@ -89,7 +115,7 @@ function App() {
             },
             error: {
               style: {
-                background: "#dc2626", 
+                background: "#dc2626",
               },
               iconTheme: {
                 primary: "#fff",

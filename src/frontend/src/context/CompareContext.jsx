@@ -14,8 +14,28 @@ export function CompareProvider({ children }) {
 
   const addToCompare = (product) => {
     setCompareList((prev) => {
-      if (prev.find((item) => item.id === product.id)) return prev; // evitar duplicados
-      if (prev.length >= 4) return prev; // máximo 4 productos
+      // evitar duplicados
+      if (prev.find((item) => item.id === product.id)) return prev;
+
+      // máximo 4 productos
+      if (prev.length >= 4) {
+        import("react-hot-toast").then(({ toast }) => {
+          toast.error(
+            "⚠️ No se pudo añadir: límite de 4 productos en comparación.",
+            {
+              position: "bottom-right",
+              style: {
+                background: "#dc2626",
+                color: "#fff",
+                borderRadius: "10px",
+                padding: "10px 15px",
+              },
+            }
+          );
+        });
+        return prev;
+      }
+
       return [...prev, product];
     });
   };
@@ -34,7 +54,13 @@ export function CompareProvider({ children }) {
 
   return (
     <CompareContext.Provider
-      value={{ compareList, addToCompare, removeFromCompare, clearCompare, isInCompare }}
+      value={{
+        compareList,
+        addToCompare,
+        removeFromCompare,
+        clearCompare,
+        isInCompare,
+      }}
     >
       {children}
     </CompareContext.Provider>
