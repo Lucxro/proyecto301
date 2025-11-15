@@ -88,6 +88,7 @@ router.get(
   "/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
+    session: false,
   })
 );
 
@@ -103,6 +104,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: "http://localhost:5173/login-error",
+    session: false,
   }),
   authControllers.googleCallBack
 );

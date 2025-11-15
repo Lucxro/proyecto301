@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 /**
  * @swagger
  * tags:
- *   name: Products
+ *   name: Productos
  *   description: Gestión de productos del catálogo
  */
 
@@ -16,17 +16,25 @@ const prisma = new PrismaClient();
  * /api/products:
  *   get:
  *     summary: Obtener todos los productos
- *     tags: [Products]
+ *     tags: [Productos]
  *     responses:
  *       200:
- *         description: Lista de productos obtenida correctamente
+ *         description: Lista de productos obtenida exitosamente
  *       500:
- *         description: Error al obtener productos
+ *         description: Error al obtener los productos
  */
 router.get("/", async (req, res) => {
   try {
     const products = await prisma.product.findMany();
-    res.json(products);
+
+    // Normalizamos campos para el frontend
+    const productosFormateados = products.map((p) => ({
+      ...p,
+      brand: p.brand || p.marca || "Sin marca",
+      os: p.os || p.sistema || "Desconocido",
+    }));
+
+    res.json(productosFormateados);
   } catch (error) {
     console.error("Error al obtener productos:", error);
     res.status(500).json({ error: "Error al obtener productos" });
@@ -35,10 +43,85 @@ router.get("/", async (req, res) => {
 
 /**
  * @swagger
+ * /api/products/brands/list:
+ *   get:
+ *     summary: Obtener lista única de marcas disponibles
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Lista de marcas obtenida correctamente
+ *       500:
+ *         description: Error al obtener las marcas
+ */
+router.get("/brands/list", async (req, res) => {
+  try {
+    const marcas = await prisma.product.findMany({
+      select: { marca: true },
+      distinct: ["marca"],
+      where: { marca: { not: null } },
+    });
+
+    const listaMarcas = marcas.map((m) => m.marca);
+    res.json(listaMarcas);
+  } catch (error) {
+    console.error("Error al obtener marcas:", error);
+    res.status(500).json({ error: "Error al obtener marcas" });
+  }
+});
+
+/**
+ * @swagger
+ * /api/products/offers:
+ *   get:
+ *     summary: Obtener productos en oferta
+ *     tags: [Productos]
+ *     responses:
+ *       200:
+ *         description: Lista de productos en oferta
+ *       500:
+ *         description: Error al obtener las ofertas
+ */
+router.get("/offers", async (req, res) => {
+  try {
+    const offers = await prisma.product.findMany({
+      where: { oferta: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const ofertasFormateadas = offers.map((p) => ({
+      id: p.id,
+      title: p.name,
+      description: p.description,
+      image: p.imageUrl
+        ? `http://localhost:3000${
+            p.imageUrl.startsWith("/") ? p.imageUrl : `/${p.imageUrl}`
+          }`
+        : "https://via.placeholder.com/300x300?text=Sin+Imagen",
+
+      price: p.price,
+      oldPrice: p.oldPrice,
+      discount:
+        p.oldPrice && p.oldPrice > p.price
+          ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100)
+          : null,
+      tag: p.oferta ? "Oferta Especial" : "",
+      tagColor: "bg-blue-600",
+      timeLeft: "Tiempo limitado",
+    }));
+
+    res.json(ofertasFormateadas);
+  } catch (error) {
+    console.error("Error al obtener ofertas:", error);
+    res.status(500).json({ error: "Error al obtener las ofertas" });
+  }
+});
+
+/**
+ * @swagger
  * /api/products/{id}:
  *   get:
  *     summary: Obtener un producto por ID
- *     tags: [Products]
+ *     tags: [Productos]
  *     parameters:
  *       - in: path
  *         name: id
@@ -48,11 +131,11 @@ router.get("/", async (req, res) => {
  *         description: ID del producto
  *     responses:
  *       200:
- *         description: Producto encontrado exitosamente
+ *         description: Producto encontrado
  *       404:
  *         description: Producto no encontrado
  *       500:
- *         description: Error interno del servidor
+ *         description: Error interno
  */
 router.get("/:id", async (req, res) => {
   const { id } = req.params;
@@ -65,7 +148,13 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
 
-    res.json(product);
+    const productoFormateado = {
+      ...product,
+      brand: product.brand || product.marca || "Sin marca",
+      os: product.os || product.sistema || "Desconocido",
+    };
+
+    res.json(productoFormateado);
   } catch (error) {
     console.error("Error al obtener producto:", error);
     res.status(500).json({ error: "Error al obtener producto" });
@@ -77,7 +166,7 @@ router.get("/:id", async (req, res) => {
  * /api/products:
  *   post:
  *     summary: Crear un nuevo producto
- *     tags: [Products]
+ *     tags: [Productos]
  *     requestBody:
  *       required: true
  *       content:
@@ -145,9 +234,9 @@ router.get("/:id", async (req, res) => {
  *       201:
  *         description: Producto creado exitosamente
  *       400:
- *         description: Datos faltantes o inválidos
+ *         description: Datos inválidos
  *       500:
- *         description: Error interno del servidor
+ *         description: Error al crear el producto
  */
 router.post("/", async (req, res) => {
   try {
@@ -172,7 +261,6 @@ router.post("/", async (req, res) => {
       detalles,
     } = req.body;
 
-    // Validación mínima
     if (!name || !price || !imageUrl) {
       return res
         .status(400)
@@ -206,9 +294,15 @@ router.post("/", async (req, res) => {
       },
     });
 
+    const productoFormateado = {
+      ...nuevoProducto,
+      brand: marca,
+      os: sistema,
+    };
+
     res.status(201).json({
       message: "✅ Producto creado exitosamente",
-      data: nuevoProducto,
+      data: productoFormateado,
     });
   } catch (error) {
     console.error("❌ Error al crear producto:", error);
